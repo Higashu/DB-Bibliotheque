@@ -1,0 +1,138 @@
+@startuml
+hide circle
+
+
+Class Ressources {
+    code : Integer
+    titre : String
+    date_apparition : Date
+    editeur : String
+    prix : Double
+}
+
+Class Exemplaires {
+    id_exemplaire : Integer
+    code_classification : String
+    etat : {'N','B','A','P'} 
+    statut : {'Disponible','Indisponible'}
+}
+
+
+
+Class Livres {
+    code_ISBN : Integer
+    résumé : String
+    langue : String
+}
+
+Class Oeuvres_musicales {
+    longueur_musique : Integer
+}
+
+ Class Films {
+    langue : String
+    duree : Integer
+    synopsis : String
+}
+
+
+
+Class Auteurs{}
+Class Compositeurs {}
+Class Interprètes {}
+Class Acteurs {}
+Class Realisateurs {}
+
+Class Contributeurs {
+    nom : String
+    prénom : String
+    date_naissance : Date
+    nationalite : String
+}
+
+
+Class Personnes {
+    login : String
+    mot_de_passe : String
+    nom : String
+    prenom : String
+    adresse : String
+    mail : String
+}
+
+
+Class Personnels {}
+
+Class Adherents {
+    date_naissance : Date
+    telephone : Integer
+    id_carte : Integer
+    date_début_adhésion : Date
+    date_fin_adhésion : Date
+    blackliste : Booleen
+
+}
+
+
+Class Emprunts {
+    date_emprunt : Date
+    durée : Integer
+    date_retour : Date
+    etat_debut : {'Neuf','Bon'}
+    etat_fin : {'Neuf','Bon','Abimé','Perdue'}
+}
+
+Class Sanctions {
+    id_sanction : Integer
+}
+
+Class Remboursements {
+    tarif : Double
+    effectue : Booleen
+}
+
+Class Suspensions {
+    date_debut : Date
+    date_fin : Date
+}
+
+Emprunts "1" -- "0..1" Sanctions : Concerne
+
+
+
+Adherents "*" -- "0..1" Exemplaires
+
+Livres "*" -- "*"Auteurs : écrit
+Oeuvres_musicales "*" -- "*"Compositeurs : Compose
+Oeuvres_musicales "*" -- "*"Interprètes : Interprete
+Films "*" -- "*"Realisateurs : Realise
+Films "*" -- "*"Acteurs : Joue
+
+
+
+
+Sanctions <|-- Remboursements
+Sanctions <|-- Suspensions
+
+Ressources <|-- Livres
+Ressources <|-- Oeuvres_musicales
+Ressources <|-- Films
+
+
+Personnes <|-- Adherents
+Personnes <|-- Personnels
+
+Contributeurs <|-- Auteurs 
+Contributeurs <|-- Compositeurs 
+Contributeurs <|-- Interprètes 
+Contributeurs <|-- Acteurs
+Contributeurs <|-- Realisateurs
+
+
+
+
+Ressources *-- Exemplaires
+
+(Adherents,Exemplaires) . Emprunts
+
+@enduml

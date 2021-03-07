@@ -1,0 +1,38 @@
+Contributeurs(#nom:str, #prenom:str, #date_naissance:date, nationalite:str) 
+
+Joue (#nom=>Contributeurs(nom), #prenom=>Contriputeurs(prenom), #date_naissance=>Contributeurs(date_naissance), #film=>Ressources(code)) 
+Réalise (#nom=>Contributeurs(nom), #prenom=>Contriputeurs(prenom), #date_naissance=>Contributeurs(date_naissance), #film=>Ressources(code)) 
+Ecrit (#nom=>Contributeurs(nom), #prenom=>Contriputeurs(prenom), #date_naissance=>Contributeurs(date_naissance), #livre=>Ressources(code)) 
+Compose (#nom=>Contributeurs(nom), #prenom=>Contriputeurs(prenom), #date_naissance=>Contributeurs(date_naissance), #musique=>Ressources(code)) 
+Interprète (#nom=>Contributeurs(nom), #prenom=>Contriputeurs(prenom), #date_naissance=>Contributeurs(date_naissance), #musique=>Ressources(code)) 
+
+Ressources (#code:int, titre :str, date_apparition:Date, editeur:str, prix:Double) 
+Films(langue:str, duree:int, synopsis:str, #code=>Ressources(Code)) 
+Livres(code_ISBN:int, résumé:str, langue:str, #code=>Ressources(Code)) 
+Oeuvres_musicales(longueur_musique:time, #code=>Ressources(Code)) 
+Exemplaires (#id_exemplaire:int, code_classification:string, etat:{"N","B","A","P"}, statut:{"Disponible","Indisponible"},#ressource=>Ressources(code)) 
+
+Adhérents(#login:str, mdp:str, nom:str, prenom:str, adresse;str, mail:str, date_naissance:date, telephone:int, id_carte:int, date_debut:date, date_fin:date, blackliste:bool) avec date_fin peut être NULL 
+Personnels(#login:str, mdp:str, nom:str, prenom:str, adresse;str, mail:str) 
+
+Sanctions(#id_sanction:int, date_debut=>Emprunts(date_retour), date_fin:Date, tarif:Double, effectue: Booleen, type_sanction={"Suspension","Remboursement"},login=>Emprunts(login)) 
+Emprunts(#date_emprunt:Date, duree:integer, date_retour:Date, etat_debut:{"N","B"}, etat_retour:{"B","A","P","NULL"},#id_exemplaire=>Exemplaires(id_exemplaire), login=>Adhérents(login))
+
+
+
+CONTRAINTES :
+CC1 : Projection(Ressources(code)) = Projection(Films(code)) U Projection(Livres(code)) U Projection(Livres(code)) U Projection(Oeuvres_musicales(code))
+CC2 : Projection(Ressources(code)) = Projection(Exemplaires(ressource)) 
+
+CC3 : Intersection(projection(Adhérents, login), projection(Personnels, login)) = {}
+
+CHECK ( (Sanctions(Type) = "Suspension" AND Effectué = NULL AND Tarif = NULL ) OR (Sanction(Type) = "Remboursement" AND Date_de_début = NULL AND Date_de_fin = NULL))
+
+DEFAULT Emprunts(date_retour) = NULL
+DEFAULT Emprunts(date_retour) = NULL
+
+CC4 : Projection(Emprunts, login, etat_fin in ('A',‘P’)=projection(Sanctions,login,tarif not null)
+
+CC5 :   R1 = Restrict(Emprunts,date_retour > date_emprunt + duree)
+        R2 = Jointure (R1,Sanctions,R1.login = Sanctions.login ET R1.date_retour = Sanctions.date_debut)
+        R3 = Restrict(R2, ( date_fin IS NULL OR date_fin != date_debut + (date_retour - ( date_emprunt+ duree)) )
